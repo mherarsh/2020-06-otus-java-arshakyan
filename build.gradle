@@ -24,7 +24,21 @@ allprojects {
     apply plugin: 'io.spring.dependency-management'
     dependencyManagement {
         dependencies {
-            dependency("com.google.guava:guava:${Versions.guava}")
+            imports {
+                mavenBom("org.springframework.boot:spring-boot-dependencies:2.3.1.RELEASE")
+            }
+        }
+    }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked"
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
         }
     }
 }
