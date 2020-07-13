@@ -3,7 +3,7 @@ package ru.mherarsh.collections;
 import java.util.*;
 
 public class SimpleArrayList<T> implements List<T> {
-    Object[] dataArray;
+    private Object[] dataArray;
     private int size = 0;
 
     public SimpleArrayList() {
@@ -13,7 +13,7 @@ public class SimpleArrayList<T> implements List<T> {
     public SimpleArrayList(Collection<? extends T> c) {
         this();
 
-        if (c.size() == 0) {
+        if (c.isEmpty()) {
             return;
         }
 
@@ -35,13 +35,9 @@ public class SimpleArrayList<T> implements List<T> {
         return Arrays.stream(dataArray).limit(size).toArray();
     }
 
-    private void extendDataArray(int newSize) {
-        dataArray = Arrays.copyOf(dataArray, newSize, Object[].class);
-    }
-
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        if (c.size() == 0) {
+        if (c.isEmpty()) {
             return true;
         }
 
@@ -173,6 +169,10 @@ public class SimpleArrayList<T> implements List<T> {
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException();
+    }
+
+    private void extendDataArray(int newSize) {
+        dataArray = Arrays.copyOf(dataArray, newSize, Object[].class);
     }
 
     class SimpleArrayIterator implements ListIterator<T> {

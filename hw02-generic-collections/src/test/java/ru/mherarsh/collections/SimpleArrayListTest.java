@@ -12,26 +12,22 @@ class SimpleArrayListTest {
 
     @Test
     void addAllTest() {
-        assertDoesNotThrow(() -> {
-            List<Integer> sampleNumsList = generateSampleNumsList(GENERATED_NUMS_COUNT);
-            List<Integer> simpleArrayList = new SimpleArrayList<>();
+        List<Integer> sampleNumsList = generateSampleNumsList(GENERATED_NUMS_COUNT);
+        List<Integer> simpleArrayList = new SimpleArrayList<>();
 
-            simpleArrayList.addAll(sampleNumsList);
+        simpleArrayList.addAll(sampleNumsList);
 
-            assertIterableEquals(sampleNumsList, simpleArrayList);
-        });
+        assertIterableEquals(sampleNumsList, simpleArrayList);
     }
 
     @Test
     void copyTest() {
-        assertDoesNotThrow(() -> {
-            List<Integer> sampleNumsList = generateSampleNumsList(GENERATED_NUMS_COUNT);
-            List<Integer> simpleArrayList = new SimpleArrayList<>(generateSampleNumsList(SIMPLE_LIST_ELEMENTS_COUNT));
+        List<Integer> sampleNumsList = generateSampleNumsList(GENERATED_NUMS_COUNT);
+        List<Integer> simpleArrayList = new SimpleArrayList<>(generateSampleNumsList(SIMPLE_LIST_ELEMENTS_COUNT));
 
-            Collections.copy(sampleNumsList, simpleArrayList);
+        Collections.copy(sampleNumsList, simpleArrayList);
 
-            assertIterableEquals(sampleNumsList.subList(0, SIMPLE_LIST_ELEMENTS_COUNT), simpleArrayList);
-        });
+        assertIterableEquals(sampleNumsList.subList(0, SIMPLE_LIST_ELEMENTS_COUNT), simpleArrayList);
     }
 
     @Test
