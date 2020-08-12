@@ -3,7 +3,7 @@ package ru.mherarsh.aop.visitors;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
-import ru.mherarsh.aop.dao.MethodDescription;
+import ru.mherarsh.aop.dto.MethodDescription;
 
 import java.util.ArrayList;
 import java.util.List;

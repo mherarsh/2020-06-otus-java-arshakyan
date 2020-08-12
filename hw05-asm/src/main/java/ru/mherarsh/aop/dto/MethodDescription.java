@@ -1,4 +1,4 @@
-package ru.mherarsh.aop.dao;
+package ru.mherarsh.aop.dto;
 
 public class MethodDescription {
     private final String name;

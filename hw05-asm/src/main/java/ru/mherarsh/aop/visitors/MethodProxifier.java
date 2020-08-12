@@ -1,7 +1,7 @@
 package ru.mherarsh.aop.visitors;
 
 import org.objectweb.asm.*;
-import ru.mherarsh.aop.dao.MethodDescription;
+import ru.mherarsh.aop.dto.MethodDescription;
 import ru.mherarsh.aop.utils.AsmUtils;
 
 import java.lang.invoke.*;
