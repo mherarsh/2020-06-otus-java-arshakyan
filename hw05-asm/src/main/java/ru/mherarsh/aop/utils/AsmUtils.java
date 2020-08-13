@@ -57,8 +57,7 @@ public class AsmUtils {
             return recipe;
         }
 
-        recipe += ", param: " + "\u0001,".repeat(length);
-        recipe = recipe.substring(0, recipe.length() - 1);
+        recipe += ", param: \u0001" + ", \u0001".repeat(length-1);
 
         return recipe;
     }
