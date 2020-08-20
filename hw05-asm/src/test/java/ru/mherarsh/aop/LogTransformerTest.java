@@ -131,28 +131,4 @@ class LogTransformerTest {
         tetBuffer = new ByteArrayOutputStream();
         System.setOut(new PrintStream(new BufferedOutputStream(tetBuffer)));
     }
-
-    /*
-    //Не работает, почему?
-    @Test
-    void addTest() throws Throwable {
-        var method = clazz.getMethod("add", int.class, int.class, int.class);
-        callMethodTest(method, 1, 2, 3);
-    }
-
-    void callMethodTest(Method method, Object... args) throws Throwable {
-        method.invoke(testObject, args); //<<<--- работает
-
-        System.out.flush();
-        var logMessageFromSOut = tetBuffer.toString();
-
-        var recipe = AsmUtils.getRecipe(method.getName(), method.getParameterCount());
-        var logMessage = StringConcatFactory.makeConcatWithConstants(
-                MethodHandles.lookup(),
-                "makeConcatWithConstants",
-                MethodType.methodType(Object.class, method.getParameterTypes()), recipe)
-                .dynamicInvoker().invokeExact(args).toString();  //<<<--- не работает
-
-        Assertions.assertEquals(logMessageFromSOut.trim(), logMessage.trim());
-    }*/
 }
