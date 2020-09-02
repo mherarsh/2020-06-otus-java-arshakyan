@@ -5,4 +5,5 @@ include 'hw02-generic-collections'
 include 'hw03-annotations'
 include 'hw04-gc-menchmark'
 include 'hw05-asm'
+include 'hw06-atm-solid'
 
