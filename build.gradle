@@ -30,6 +30,7 @@ allprojects {
             dependency("com.google.guava:guava:${Versions.guava}")
             dependency("org.reflections:reflections:${Versions.reflections}")
             dependency("org.ow2.asm:asm-commons:${Versions.asm}")
+            dependency("org.glassfish:javax.json:${Versions.glassfishJson}")
         }
     }
 

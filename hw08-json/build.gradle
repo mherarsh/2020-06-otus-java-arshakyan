@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
+
+dependencies {
+    implementation 'com.google.code.gson:gson'
+    implementation 'javax.json:javax.json-api'
+    implementation 'org.glassfish:javax.json'
+    testImplementation ('org.junit.jupiter:junit-jupiter-engine')
+}
+
+shadowJar {
+    archiveBaseName.set('hw08-json')
+    archiveVersion.set('0.1')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': 'ru.mherarsh.App'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.with {
+        encoding = 'UTF-8'
+    }
+}
