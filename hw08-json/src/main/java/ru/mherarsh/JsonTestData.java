@@ -3,6 +3,7 @@ package ru.mherarsh;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class JsonTestData {
     private final int integer1;
@@ -11,14 +12,16 @@ public class JsonTestData {
     private final int[] intArray;
     private final List<String> stringList;
     private final JsonTestData testData;
+    private final List<JsonTestData> testDataList;
 
-    public JsonTestData(int integer1, String someString, int integer2, int[] intArray, List<String> stringList, JsonTestData testData) {
+    public JsonTestData(int integer1, String someString, int integer2, int[] intArray, List<String> stringList, JsonTestData testData, List<JsonTestData> testDataList) {
         this.integer1 = integer1;
         this.someString = someString;
         this.integer2 = integer2;
         this.intArray = intArray;
         this.stringList = stringList;
         this.testData = testData;
+        this.testDataList = testDataList;
     }
 
     @Override
@@ -31,7 +34,8 @@ public class JsonTestData {
                 Objects.equals(someString, that.someString) &&
                 Arrays.equals(intArray, that.intArray) &&
                 Objects.equals(stringList, that.stringList) &&
-                Objects.equals(testData, that.testData);
+                Objects.equals(testData, that.testData) &&
+                Objects.equals(testDataList, that.testDataList);
     }
 
     @Override

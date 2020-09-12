@@ -1,92 +1,88 @@
 package ru.mherarsh;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+
+import static ru.mherarsh.PrimitiveToJsonValueConverter.isPrimitive;
+import static ru.mherarsh.PrimitiveToJsonValueConverter.toJsonValue;
 
 public class MyGson {
-    public String toJson(Object obj) throws Exception {
-        return serializeObject(obj).toString();
+    public String toJson(Object value) throws Exception {
+        return serializeByType(value).toString();
     }
 
-    private JsonValue serializeObject(Object obj) throws Exception {
-        var jsonObject = Json.createObjectBuilder();
-
-        if (obj == null) {
-            return jsonObject.build();
+    private JsonValue serializeByType(Object value) throws Exception {
+        if (value == null) {
+            return JsonValue.NULL;
         }
 
-        var fields = getFields(obj);
+        var valueType = value.getClass();
+
+        if (isPrimitive(valueType)) {
+            return serializePrimitives(valueType, value);
+        } else if (valueType.isArray()) {
+            return serializeArrays(value);
+        } else if (Iterable.class.isAssignableFrom(valueType)) {
+            return serializeIterables(value);
+        } else {
+            return serializeObject(value);
+        }
+    }
+
+    private JsonValue serializeObject(Object value) throws Exception {
+        var jsonObject = Json.createObjectBuilder();
+
+        var fields = getFields(value);
         for (var field : fields) {
-            field.setAccessible(true);
-
-            var fieldValue = field.get(obj);
-            if (fieldValue == null) {
-                continue;
-            }
-
-            var fieldName = field.getName();
-            var fieldType = field.getType();
-
-            if (isPrimitive(fieldType)) {
-                serializePrimitives(jsonObject, fieldName, fieldValue);
-            } else if (fieldType.isArray()) {
-                serializeArrays(jsonObject, fieldName, fieldValue);
-            } else if (Iterable.class.isAssignableFrom(fieldType)) {
-                serializeIterables(jsonObject, fieldName, fieldValue);
-            } else {
-                jsonObject.add(fieldName, serializeObject(fieldValue));
-            }
+            addJsonValue(jsonObject, field, value);
         }
 
         return jsonObject.build();
     }
 
-    private void serializePrimitives(JsonObjectBuilder jsonObject, String fieldName, Object fieldValue) {
-        jsonObject.add(fieldName, Json.createValue("" + fieldValue));
+    private void addJsonValue(JsonObjectBuilder jsonObject, Field field, Object object) throws Exception {
+        field.setAccessible(true);
+
+        var fieldValue = field.get(object);
+        if (fieldValue == null) {
+            return;
+        }
+
+        jsonObject.add(field.getName(), serializeByType(fieldValue));
     }
 
-    private void serializeArrays(JsonObjectBuilder jsonObject, String fieldName, Object fieldValue) throws Exception {
+    private JsonValue serializePrimitives(Type type, Object value) {
+        return toJsonValue(type, value);
+    }
+
+    private JsonArray serializeArrays(Object array) throws Exception {
         var jsonArray = Json.createArrayBuilder();
-        int length = Array.getLength(fieldValue);
+        int length = Array.getLength(array);
         for (int i = 0; i < length; i++) {
-            var value = Array.get(fieldValue, i);
-            validateFieldType(value.getClass(), fieldName);
-
-            jsonArray.add("" + value);
+            var value = Array.get(array, i);
+            jsonArray.add(serializeByType(value));
         }
 
-        jsonObject.add(fieldName, jsonArray.build());
+        return jsonArray.build();
     }
 
-    private void serializeIterables(JsonObjectBuilder jsonObject, String fieldName, Object fieldValue) {
+    private JsonArray serializeIterables(Object iterable) throws Exception {
         var jsonArray = Json.createArrayBuilder();
 
-        for (var value : (Iterable) fieldValue) {
-            validateFieldType(value.getClass(), fieldName);
-
-            jsonArray.add("" + value);
+        for (var value : (Iterable) iterable) {
+            jsonArray.add(serializeByType(value));
         }
 
-        jsonObject.add(fieldName, jsonArray.build());
-    }
-
-    private void validateFieldType(Class<?> type, String fieldName) {
-        if (!isPrimitive(type)) {
-            throw new IllegalArgumentException("field '" + fieldName + "' contains not supported data types");
-        }
+        return jsonArray.build();
     }
 
     private Field[] getFields(Object obj) {
         return obj.getClass().getDeclaredFields();
     }
-
-    private boolean isPrimitive(Class<?> type) {
-        return type.isPrimitive()
-                || Number.class.isAssignableFrom(type)
-                || type.equals(String.class)
-                || type.equals(Character.class);
-    }
 }
+
