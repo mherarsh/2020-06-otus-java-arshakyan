@@ -56,7 +56,7 @@ public class MyGson {
         jsonObject.add(field.getName(), serializeByType(fieldValue));
     }
 
-    private JsonValue serializePrimitives(Type type, Object value) {
+    private JsonValue serializePrimitives(Class<?> type, Object value) {
         return toJsonValue(type, value);
     }
 
