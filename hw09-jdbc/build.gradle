@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+    id "org.flywaydb.flyway" version "6.5.5"
+
+}
+
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
+
+dependencies {
+    implementation 'com.h2database:h2'
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'org.flywaydb:flyway-core'
+    testImplementation ('org.junit.jupiter:junit-jupiter-engine')
+}
+
+shadowJar {
+    archiveBaseName.set('hw09-jdbc')
+    archiveVersion.set('0.1')
+    archiveClassifier.set('')
+    manifest {
+        attributes 'Main-Class': 'ru.mherarsh.App'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.with {
+        encoding = 'UTF-8'
+    }
+}
+
+flyway {
+    url = 'jdbc:h2:file:C:/data/sample'
+}
