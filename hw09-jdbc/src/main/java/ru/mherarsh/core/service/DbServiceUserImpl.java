@@ -7,6 +7,9 @@ import ru.mherarsh.core.model.User;
 
 import java.util.Optional;
 
+/**
+ * @author mherarsh
+ */
 public class DbServiceUserImpl implements DBServiceUser {
     private static final Logger logger = LoggerFactory.getLogger(DbServiceUserImpl.class);
 
