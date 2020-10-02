@@ -10,5 +10,5 @@ include 'hw07-patterns'
 include 'hw07-patterns:homework'
 include 'hw08-json'
 include 'hw09-jdbc'
-
+include 'hw10-jpql'
 
