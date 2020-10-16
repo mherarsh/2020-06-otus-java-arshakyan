@@ -3,11 +3,8 @@ package ru.mherarsh;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.mherarsh.cachehw.UserDaoCache;
+import ru.mherarsh.cachehw.MyCache;
 import ru.mherarsh.core.model.AddressDataSet;
 import ru.mherarsh.core.model.PhoneDataSet;
 import ru.mherarsh.core.model.User;
@@ -17,8 +14,8 @@ import ru.mherarsh.hibernate.HibernateUtils;
 import ru.mherarsh.hibernate.dao.UserDaoHibernate;
 import ru.mherarsh.hibernate.sessionmanager.SessionManagerHibernate;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
@@ -28,16 +25,15 @@ import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 @OutputTimeUnit(MILLISECONDS)
 public class HomeWorkCache {
     public static final String HIBERNATE_CFG_FILE = "hibernate.cfg.xml";
-    private static final Logger logger = LoggerFactory.getLogger(HomeWorkCache.class);
-    private static final int heapSize = 100;
-    private static final int idRange = 500;
-    private static final int getIterations = 1;
+    private static final int COUNT = 100;
 
     private DBServiceUser dbServiceUser;
     private DBServiceUser dbServiceUserCached;
+    private List<Long> usersIdList;
+    private List<Long> usersIdListCached;
 
     public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder().include(HomeWorkCache.class.getSimpleName()).forks(1).build();
+        var opt = new OptionsBuilder().include(HomeWorkCache.class.getSimpleName()).forks(1).build();
         new Runner(opt).run();
     }
 
@@ -49,48 +45,39 @@ public class HomeWorkCache {
     }
 
     @Setup
-    public void setup(){
+    public void setup() {
         var sessionManager = getHibernateSessionManager();
         var userDao = new UserDaoHibernate(sessionManager);
+        var cache = new MyCache<Long, User>();
 
         dbServiceUser = new DbServiceUserImpl(userDao);
-        dbServiceUserCached = new DbServiceUserImpl(new UserDaoCache(userDao, heapSize));
+        dbServiceUserCached = new DbServiceUserImpl(userDao, cache);
 
-        generateUsers(dbServiceUser, idRange);
+        usersIdList = generateUsers(dbServiceUser, COUNT);
+        usersIdListCached = generateUsers(dbServiceUserCached, COUNT);
     }
 
     @Benchmark
-    public void getFromDb(){
-        getUsers(dbServiceUser, idRange, getIterations);
+    public void getUsersFromDb() {
+        getUsers(dbServiceUser, usersIdList);
     }
 
     @Benchmark
-    public void getCached(){
-        getUsers(dbServiceUserCached, idRange, getIterations);
+    public void getUsersCached() {
+        getUsers(dbServiceUserCached, usersIdListCached);
     }
 
-    private void getUsers(DBServiceUser dbServiceUser, int range, int iterations) {
-        for (int i = 0; i < iterations; i++) {
-            for (int j = 0; j < range; j++) {
-                var id = getRandomId(range);
-                var userById = dbServiceUser.getUser(id);
-                userById.ifPresent(System.out::println);
-            }
+    private void getUsers(DBServiceUser dbServiceUser, List<Long> idList) {
+        idList.forEach(id -> dbServiceUser.getUser(id).ifPresent(System.out::println));
+    }
+
+    private List<Long> generateUsers(DBServiceUser dbServiceUser, int count) {
+        var idList = new ArrayList<Long>();
+        for (int i = 0; i < count; i++) {
+            idList.add(dbServiceUser.saveUser(generateUserById(i)));
         }
-    }
 
-    private int getRandomId(int range){
-        var min = 0;
-        var max = range-1;
-        var diff = max - min;
-        var random = new Random();
-        return random.nextInt(diff + 1) + min;
-    }
-
-    private void generateUsers(DBServiceUser dbServiceUser, int range) {
-        for (int i = 0; i < range; i++) {
-            dbServiceUser.saveUser(generateUserById(i));
-        }
+        return idList;
     }
 
     private User generateUserById(int id) {

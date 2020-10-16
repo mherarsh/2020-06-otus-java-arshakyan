@@ -1,8 +1,11 @@
 package ru.mherarsh.cachehw;
 
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
@@ -11,49 +14,32 @@ import java.util.WeakHashMap;
  */
 public class MyCache<K, V> implements HwCache<K, V> {
     //Надо реализовать эти методы
-    private final Map<HwListener<K, V>, Boolean> listeners = new WeakHashMap<>();
-    private final Map<K, SoftReference<V>> values = new HashMap<>();
-    private final int heapSize;
-
-    public MyCache(int heapSize) {
-        if (heapSize <= 0) {
-            throw new IllegalArgumentException("Heap size should be > 0");
-        }
-
-        this.heapSize = heapSize;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(MyCache.class);
+    private final Set<HwListener<K, V>> listeners = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Map<K, V> values = new WeakHashMap<>();
 
     @Override
     public void put(K key, V value) {
-        deleteDeadReferences();
-
-        if (!values.containsKey(key) && values.size() >= heapSize) {
-            deleteRandomValue();
-        }
-
-        putValue(key, value);
-
-        notifyListeners(key, value, "put");
+        values.put(key, value);
+        notifyListeners(key, value, CacheActions.PUT);
     }
 
     @Override
     public void remove(K key) {
-        if (values.containsKey(key)) {
-            notifyListeners(key, getValue(key), "remove");
-            values.remove(key);
+        var value = values.remove(key);
+        if (value != null) {
+            notifyListeners(key, value, CacheActions.REMOVE);
         }
     }
 
     @Override
     public V get(K key) {
-        var value = getValue(key);
-        notifyListeners(key, value, "get");
-        return value;
+        return values.get(key);
     }
 
     @Override
     public void addListener(HwListener<K, V> listener) {
-        listeners.put(listener, true);
+        listeners.add(listener);
     }
 
     @Override
@@ -61,24 +47,13 @@ public class MyCache<K, V> implements HwCache<K, V> {
         listeners.remove(listener);
     }
 
-    private void deleteRandomValue() {
-        var randomKey = values.keySet().stream().findAny();
-        randomKey.ifPresent(values::remove);
-    }
-
-    private void deleteDeadReferences() {
-        values.entrySet().removeIf(x -> x.getValue().get() == null);
-    }
-
-    private void notifyListeners(K key, V value, String action) {
-        listeners.keySet().forEach(listener -> listener.notify(key, value, action));
-    }
-
-    private void putValue(K key, V value) {
-        values.put(key, new SoftReference<>(value));
-    }
-
-    private V getValue(K key) {
-        return values.get(key).get();
+    private void notifyListeners(K key, V value, CacheActions action) {
+        listeners.forEach(listener -> {
+            try {
+                listener.notify(key, value, action.name());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        });
     }
 }
