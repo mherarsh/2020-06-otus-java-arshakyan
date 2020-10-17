@@ -57,7 +57,9 @@ public class DbServiceUserImpl implements DBServiceUser {
         try (var sessionManager = userDao.getSessionManager()) {
             sessionManager.beginSession();
             try {
-                return userDao.findById(id);
+                var userFromDb = userDao.findById(id);
+                userFromDb.ifPresent(this::cachePut);
+                return userFromDb;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 sessionManager.rollbackSession();

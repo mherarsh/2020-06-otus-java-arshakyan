@@ -26,8 +26,8 @@ public class MyCache<K, V> implements HwCache<K, V> {
 
     @Override
     public void remove(K key) {
-        var value = values.remove(key);
-        if (value != null) {
+        if(values.containsKey(key)){
+            var value = values.remove(key);
             notifyListeners(key, value, CacheActions.REMOVE);
         }
     }
