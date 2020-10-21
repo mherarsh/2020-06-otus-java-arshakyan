@@ -1,0 +1,119 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Пользователи</title>
+    <style>
+        .add-row {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body onload="loadPage()">
+<h4>Пользователи</h4>
+
+<div style="display: flex">
+    <div class="add-row">
+        <div>
+            <div>Имя</div>
+            <input type="text" id="name">
+        </div>
+    </div>
+    <div class="add-row">
+        <div>
+            <div>Адрес</div>
+            <input type="text" id="address">
+        </div>
+    </div>
+    <div class="add-row">
+        <div>
+            <div>Телефон</div>
+            <input type="text" id="phone">
+        </div>
+    </div>
+    <div class="add-row">
+        <input type="button" value="Добавить" style="height: 40px;" onclick="addUser()">
+    </div>
+</div>
+
+<table style="width: 400px;" id="usersTable">
+</table>
+</body>
+
+<script>
+    const URL_API_USER = 'api/user/';
+
+    function getUsers() {
+        fetch(URL_API_USER)
+            .then(response => response.json())
+            .then(user => updateUsersTable(user));
+    }
+
+    function addUser() {
+        let name = document.getElementById("name");
+        let address = document.getElementById("address");
+        let phone = document.getElementById("phone");
+
+        if (name.value === "") {
+            alert("Имя пользователя пустое!")
+            return;
+        }
+
+        let body = new URLSearchParams();
+        body.append("name", name.value);
+        body.append("address", address.value);
+        body.append("phone", phone.value);
+
+        name.value = "";
+        address.value = "";
+        phone.value = "";
+
+        fetch(URL_API_USER, {
+            method: 'POST',
+            body: body,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        }).then(() => getUsers());
+    }
+
+    function updateUsersTable(users) {
+        let tableRows = "";
+
+        for (let i = 0; i < users.length; i++) {
+            let user = users[i];
+            console.log(user)
+            tableRows += `
+                <tr>
+                    <td>` + user.id + `</td>
+                    <td>` + user.name + `</td>
+                    <td>` + user.address + `</td>
+                    <td>` + user.phone + `</td>
+                </tr>`;
+        }
+
+        let table = document.getElementById("usersTable");
+        table.innerHTML = `
+            <thead>
+                <tr style="border-bottom:solid 1px black;">
+                    <td style="width: 50px">Id</td>
+                    <td style="width: 150px">Имя</td>
+                    <td style="width: 100px">Адрес</td>
+                    <td style="width: 100px">Телефон</td>
+                </tr>
+                <tr><td colspan="4" class="divider"><hr/></td></tr>
+            </thead>
+            <tbody>
+                ` + tableRows + `
+            </tbody>
+        `;
+    }
+
+    function loadPage() {
+        getUsers();
+    }
+</script>
+</html>
