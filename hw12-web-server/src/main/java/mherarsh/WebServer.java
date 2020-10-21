@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import mherarsh.core.model.AddressDataSet;
 import mherarsh.core.model.PhoneDataSet;
 import mherarsh.core.model.User;
+import mherarsh.core.service.DBServiceUser;
 import mherarsh.core.service.DbServiceUserImpl;
 import mherarsh.core.service.InMemoryLoginServiceImpl;
 import mherarsh.core.service.TemplateProcessorImpl;
@@ -43,7 +44,7 @@ public class WebServer {
         return new SessionManagerHibernate(sessionFactory);
     }
 
-    private static void generateUsers(DbServiceUserImpl userService) {
+    private static void generateUsers(DBServiceUser userService) {
         for (var i = 0; i < 5; i++) {
             var user = User.builder().name("user " + i).build();
             user.setAddress(AddressDataSet.builder().street("street " + i).build());

@@ -35,21 +35,7 @@ public class UsersApiServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            var name = request.getParameter("name");
-            var address = request.getParameter("address");
-            var phone = request.getParameter("phone");
-
-            if(name == null || name.isBlank()){
-                throw new IllegalArgumentException("name is empty");
-            }
-
-            var user = User.builder().name(name).build();
-            user.setAddress(AddressDataSet.builder().street(address).build());
-            user.setPhones(List.of(
-                    PhoneDataSet.builder().number(phone).user(user).build()
-            ));
-
-            serviceUser.saveUser(user);
+            saveUserFromRequest(request);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println("{}");
@@ -60,6 +46,28 @@ public class UsersApiServlet extends HttpServlet {
             response.setContentType(CONTENT_TYPE_JSON);
             response.getWriter().close();
         }
+    }
+
+    private void saveUserFromRequest(HttpServletRequest request) {
+        var name = request.getParameter("name");
+        var address = request.getParameter("address");
+        var phone = request.getParameter("phone");
+
+        saveUser(name, address, phone);
+    }
+
+    private void saveUser(String name, String address, String phone) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("name is empty");
+        }
+
+        var user = User.builder().name(name).build();
+        user.setAddress(AddressDataSet.builder().street(address).build());
+        user.setPhones(List.of(
+                PhoneDataSet.builder().number(phone).user(user).build()
+        ));
+
+        serviceUser.saveUser(user);
     }
 }
 
