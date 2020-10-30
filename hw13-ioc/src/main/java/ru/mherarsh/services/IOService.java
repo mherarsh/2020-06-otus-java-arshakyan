@@ -1,0 +1,7 @@
+package ru.mherarsh.services;
+
+public interface IOService {
+    void out(String message);
+    String readLn(String prompt);
+    int readInt(String prompt);
+}
