@@ -1,11 +1,13 @@
 package ru.mherarsh.hibernate.sessionmanager;
 
+import org.springframework.stereotype.Component;
 import ru.mherarsh.core.sessionmanager.SessionManager;
 import ru.mherarsh.core.sessionmanager.SessionManagerException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+@Component
 public class SessionManagerHibernate implements SessionManager {
     private DatabaseSessionHibernate databaseSession;
     private final SessionFactory sessionFactory;
