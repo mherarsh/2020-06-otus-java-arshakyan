@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+}
+
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
+
+dependencies {
+    implementation project(":hw16-message-system:message-system")
+    implementation project(":hw16-message-system:dao")
+
+    implementation("com.google.code.gson:gson")
+    implementation("ch.qos.logback:logback-classic")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+    implementation("org.webjars:webjars-locator-core")
+    implementation("org.webjars:sockjs-client")
+    implementation("org.webjars:stomp-websocket")
+    implementation("org.webjars:jquery")
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.with {
+        encoding = 'UTF-8'
+    }
+}

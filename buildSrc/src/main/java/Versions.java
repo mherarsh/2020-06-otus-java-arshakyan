@@ -8,4 +8,7 @@ interface Versions {
     String jetty = "9.4.31.v20200723";
     String freemarker = "2.3.30";
     String javassist = "3.24.0-GA";
+    String sockjs = "1.1.2";
+    String stomp = "2.3.3-1";
+    String jquery = "3.2.1";
 }
