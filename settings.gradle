@@ -20,6 +20,15 @@ include 'hw16-message-system:dao'
 include 'hw16-message-system:message-system'
 include 'hw16-message-system:web-app'
 
+include 'hw17-multiprocess:common'
+include 'hw17-multiprocess:dao'
+include 'hw17-multiprocess:message-system'
+include 'hw17-multiprocess:message-client'
+include 'hw17-multiprocess:message-server'
+include 'hw17-multiprocess:frontend'
+include 'hw17-multiprocess:db-server'
+include 'hw17-multiprocess:app-starter'
+
 
 
 
