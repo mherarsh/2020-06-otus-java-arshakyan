@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+ms:
+  clientId: "db1"
+  receiverId: ""
+  serverEndpoint: "ws://localhost:8080/msg-system-endpoint"
+  producerEndpoint: "/app/produceMessage"
+  subscriptionPrefix: "/topic/consumeMessage"
+
+logging.level.org.springframework.web: DEBUG

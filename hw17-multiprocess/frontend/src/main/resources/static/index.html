@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Пользователи</title>
+    <style>
+        .add-row {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+</head>
+
+<body onload="bodyOnLoad()">
+<h4>Users</h4>
+
+<div style="display: flex">
+    <div class="add-row">
+        <div>
+            <div>Name</div>
+            <input type="text" id="name">
+        </div>
+    </div>
+    <div class="add-row">
+        <div>
+            <div>Address</div>
+            <input type="text" id="address">
+        </div>
+    </div>
+    <div class="add-row">
+        <div>
+            <div>Phone</div>
+            <input type="text" id="phone">
+        </div>
+    </div>
+    <div class="add-row">
+        <input type="button" value="Add user" style="height: 40px;" onclick="putUser()">
+    </div>
+</div>
+
+<table style="width: 400px;" id="usersTable">
+</table>
+</body>
+
+<script>
+    const usersList = [];
+    const stompClient = Stomp.over(new SockJS('/users-websocket'));
+    const sessionId = getNewGuid();
+
+    function bodyOnLoad() {
+        stompClient.connect({}, () => {
+            stompClient.subscribe('/topic/usersChanges', (response) => {
+                getAllAsync();
+            });
+
+            stompClient.subscribe(`/topic/getUsersResponse.${sessionId}`, (response) => {
+                updateUsers(JSON.parse(response.body));
+            });
+
+            getAllAsync();
+        });
+    }
+
+    function getAllAsync() {
+        stompClient.send(`/app/getUsers.${sessionId}`, {}, {});
+    }
+
+    function putUser() {
+        const userDto = getUserDto();
+
+        if (userDto.name === "") {
+            alert("Имя пользователя пустое!")
+            return;
+        }
+
+        stompClient.send(`/app/putUser.${sessionId}`, {}, JSON.stringify(userDto));
+    }
+
+    function updateUsers(users) {
+        users.forEach((user) => {
+            if (!usersList.some(x => x.id === user.id)) {
+                usersList.push(user);
+            }
+        });
+
+        drawUsers();
+    }
+
+    function drawUsers() {
+        let tableRows = "";
+
+        for (let i = 0; i < usersList.length; i++) {
+            let user = usersList[i];
+            console.log(user)
+            tableRows += `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.address}</td>
+                    <td>${user.phone}</td>
+                </tr>`;
+        }
+
+        let table = document.getElementById("usersTable");
+        table.innerHTML = `
+            <thead>
+                <tr style="border-bottom:solid 1px black;">
+                    <td style="width: 50px">Id</td>
+                    <td style="width: 150px">Name</td>
+                    <td style="width: 100px">Address</td>
+                    <td style="width: 100px">Phone</td>
+                </tr>
+                <tr><td colspan="4" class="divider"><hr/></td></tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>`;
+    }
+
+    function getUserDto() {
+        let name = document.getElementById("name");
+        let address = document.getElementById("address");
+        let phone = document.getElementById("phone");
+
+        const userDto = {
+            name: name.value,
+            address: address.value,
+            phone: phone.value,
+        };
+
+        name.value = "";
+        address.value = "";
+        phone.value = "";
+
+        return userDto;
+    }
+
+    function getNewGuid() {
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+    }
+</script>
+</html>
