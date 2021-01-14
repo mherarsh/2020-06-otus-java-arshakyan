@@ -1,4 +1,4 @@
-package mherarsh.core.model;
+package ru.mherarsh.core.model;
 
 import lombok.*;
 
