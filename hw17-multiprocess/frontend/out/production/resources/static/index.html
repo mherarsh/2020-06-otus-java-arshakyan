@@ -72,11 +72,10 @@
     function putUser() {
         const userDto = getUserDto();
 
-        //Будем обрабатывать ошибки со стороны сервера
-        // if (userDto.name === "") {
-        //     alert("Имя пользователя пустое!")
-        //     return;
-        // }
+        if (userDto.name === "") {
+            alert("Имя пользователя пустое!")
+            return;
+        }
 
         stompClient.send(`/app/putUser.${sessionId}`, {}, JSON.stringify(userDto));
     }
